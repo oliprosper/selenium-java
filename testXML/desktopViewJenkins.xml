@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="TestWeb" parallel="tests" thread-count="5">
+	<parameter name="groupReport" value="/Report.html" />
+	<parameter name="toMails" value="soli@seamfix.com" />
+	<parameter name="server" value="remoteJenkins" />
+	<parameter name="environment" value="desktop" />
+	<parameter name="device" value="laptop"/>
+	<parameter name="myBrowser" value="chrome" />
+	<parameter name="testEnv" value="stagingData" />
+	<parameter name="deviceNo" value="1" />
+
+	<test name="SignUp" preserve-order="true">
+		<classes>
+			<class name="module.SignUp">
+				<methods>
+					<include name=""></include>
+				</methods>
+			</class>
+		</classes>
+	</test>
+</suite>
