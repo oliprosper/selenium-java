@@ -1,19 +1,37 @@
 package util;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.LocalFileDetector;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.markuputils.ExtentColor;
+import com.aventstack.extentreports.markuputils.Markup;
+import com.aventstack.extentreports.markuputils.MarkupHelper;
+import com.testinium.deviceinformation.helper.ProcessHelper;
 
 /**
  * @author soli
@@ -242,6 +260,7 @@ public class TestUtils extends TestBase{
 	}
 
 	public static void Type(By locator, String text) {
+		getDriver().findElement(locator).clear();
 		getDriver().findElement(locator).sendKeys(text);
 	}
 
@@ -356,6 +375,128 @@ public class TestUtils extends TestBase{
 
 		return true;
 	}
+
+	/**
+	 * @param value
+	 * @return string value.
+	 * @throws InterruptedException
+	 * @description to convert string value to int value for calculations
+	 */
+	public static String executeAdbCommand(String command) throws IOException {
+		Process process = null;
+		StringBuilder builder = new StringBuilder();
+		String commandString;
+		commandString = String.format("%s", command);
+		try {
+			process = ProcessHelper.runTimeExec(commandString);
+		} catch (IOException e) {
+		}
+		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			System.out.print(line + "\n");
+			builder.append(line);
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * @param String
+	 *            value.
+	 * @return Dimension.
+	 * @throws InterruptedException
+	 * @description to set browser view dimension to specified mobile screen
+	 *              resolution.
+	 */
+	public static Dimension setDimension(String device) {
+		Dimension dimension = null;
+		if (device.equalsIgnoreCase("iPhone 8")) {
+			dimension = new Dimension(375, 667);
+
+		} else if (device.equalsIgnoreCase("iPhone X")) {
+			dimension = new Dimension(375, 812);
+
+		} else if (device.equalsIgnoreCase("iPhone 8 Plus")) {
+			dimension = new Dimension(414, 736);
+
+		} else if (device.equalsIgnoreCase("iPad Mini")) {
+			dimension = new Dimension(768, 1024);
+
+		} else if (device.equalsIgnoreCase("Galaxy S5")) {
+			dimension = new Dimension(360, 640);
+
+		} else if (device.equalsIgnoreCase("Galaxy S9")) {
+			dimension = new Dimension(360, 740);
+
+		} else if (device.equalsIgnoreCase("Nexus 5X")) {
+			dimension = new Dimension(412, 732);
+
+		} else if (device.equalsIgnoreCase("Galaxy Tab 10")) {
+			dimension = new Dimension(800, 1280);
+
+		} else {
+			System.out.println(device + " not found");
+		}
+		return dimension;
+	}
+
+	/**
+	 * @return Browser name and version.
+	 * @description Get Browser name and version.
+	 */
+	public static String CheckBrowser() {
+		Capabilities caps = ((RemoteWebDriver) getDriver()).getCapabilities();
+		String os = caps.getBrowserName() + " " + caps.getVersion();
+		return os;
+	}
+
+	/**
+	 * @return Base64string image.
+	 * @description To take screenshot of a current screen view.
+	 */
+	public static String addScreenshot() {
+
+		TakesScreenshot ts = (TakesScreenshot) getDriver();
+		File scrFile = ts.getScreenshotAs(OutputType.FILE);
+
+		String encodedBase64 = null;
+		FileInputStream fileInputStreamReader = null;
+		try {
+			fileInputStreamReader = new FileInputStream(scrFile);
+			byte[] bytes = new byte[(int) scrFile.length()];
+			fileInputStreamReader.read(bytes);
+			encodedBase64 = new String(Base64.encodeBase64(bytes));
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "data:image/png;base64," + encodedBase64;
+	}
 	
+	public static void title(String phrase) {
+		String word = phrase;
+        Markup w = MarkupHelper.createLabel(word, ExtentColor.BLUE);
+        testInfo.get().info(w);
+	}
+	
+	/*
+	* param by - locator of the element where you enter the path of the file
+	* param fileName – name of the file to be uploaded
+	*/
+	public static void uploadFile(By by, String fileName) {
+		try {
+			WebElement element = getDriver().findElement(by);
+			LocalFileDetector detector = new LocalFileDetector();
+			String path = new File(System.getProperty("user.dir") + "/files").getAbsolutePath() + "/" + fileName;
+			File file = detector.getLocalFile(path);
+			((RemoteWebElement) element).setFileDetector(detector);
+			element.sendKeys(file.getAbsolutePath());
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail("file upload not successful");
+		}
+	}
 
 }

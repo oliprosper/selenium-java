@@ -10,11 +10,11 @@
 	<parameter name="testEnv" value="stagingData" />
 	<parameter name="deviceNo" value="1" />
 
-	<test name="SignUp" preserve-order="true">
+	<test name="SignIn" preserve-order="true">
 		<classes>
-			<class name="module.SignUp">
+			<class name="module.SignIn">
 				<methods>
-					<include name=""></include>
+					<include name="sample"></include>
 				</methods>
 			</class>
 		</classes>

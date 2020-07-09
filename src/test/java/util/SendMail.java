@@ -66,7 +66,7 @@ public class SendMail {
 
             message.setSubject("Automated Test Result");
             MimeBodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText("Hello," + "\n" +"Attached to this mail is the automated test report.  \nKindly download to view content. \n\nRegards, \nQuality Assurance");
+            messageBodyPart.setText("Hello," + "\n" +"Attached to this mail is the automated test report.  \nKindly download to view content. \n\nRegards, \nTest");
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
@@ -82,7 +82,7 @@ public class SendMail {
 
             System.out.println("Sending...");
             message.setContent(multipart);
-			Transport.send(message, "Google EmailAddress", "Password");
+			Transport.send(message, "test.report@gmail.com", "");
             System.out.println("Sent.");
         } catch (MessagingException ex) { 
             throw new RuntimeException(ex);
